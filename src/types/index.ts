@@ -54,6 +54,7 @@ export interface NewsArticle {
   read_time: string;
   date: string;
   source: string;
+  content?: string;
 }
 
 export interface Product {
