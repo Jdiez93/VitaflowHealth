@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Leaf, Mail, Lock, User, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -13,14 +14,24 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password.length < 6) {
+      toast({ title: 'Error', description: 'La contraseña debe tener al menos 6 caracteres.', variant: 'destructive' });
+      return;
+    }
     setLoading(true);
-    setTimeout(() => {
-      toast({ title: 'Demo', description: 'Conecta Supabase para habilitar el registro.' });
-      setLoading(false);
-    }, 1000);
+    const { error } = await signUp(email, password, name);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: '¡Cuenta creada!', description: 'Revisa tu email para confirmar tu cuenta.' });
+      navigate('/login');
+    }
+    setLoading(false);
   };
 
   return (

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { mockNews } from '@/data/mock';
 import { Clock, ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const NewsFeed = () => (
   <section className="py-20">
@@ -23,24 +24,31 @@ const NewsFeed = () => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1 }}
-            className="group glass-card overflow-hidden hover-lift cursor-pointer"
+            className="group glass-card overflow-hidden hover-lift"
           >
-            <div className="aspect-[4/3] overflow-hidden rounded-t-3xl">
-              <img src={article.image_url} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-            </div>
-            <div className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs font-medium px-2 py-1 rounded-lg bg-accent text-accent-foreground">{article.category}</span>
-                <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{article.read_time}</span>
+            <Link to="/news" className="block">
+              <div className="aspect-[4/3] overflow-hidden rounded-t-3xl">
+                <img src={article.image_url} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
               </div>
-              <h3 className="font-display font-semibold text-sm leading-snug mb-2 group-hover:text-primary transition-colors line-clamp-2">{article.title}</h3>
-              <p className="text-xs text-muted-foreground line-clamp-2">{article.summary}</p>
-              <div className="mt-3 flex items-center gap-1 text-xs text-primary font-medium">
-                Leer más <ArrowUpRight className="w-3 h-3" />
+              <div className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs font-medium px-2 py-1 rounded-lg bg-accent text-accent-foreground">{article.category}</span>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{article.read_time}</span>
+                </div>
+                <h3 className="font-display font-semibold text-sm leading-snug mb-2 group-hover:text-primary transition-colors line-clamp-2">{article.title}</h3>
+                <p className="text-xs text-muted-foreground line-clamp-2">{article.summary}</p>
+                <div className="mt-3 flex items-center gap-1 text-xs text-primary font-medium">
+                  Leer más <ArrowUpRight className="w-3 h-3" />
+                </div>
               </div>
-            </div>
+            </Link>
           </motion.article>
         ))}
+      </div>
+      <div className="text-center mt-8">
+        <Link to="/news" className="text-sm text-primary font-medium hover:underline inline-flex items-center gap-1">
+          Ver todas las noticias <ArrowUpRight className="w-3 h-3" />
+        </Link>
       </div>
     </div>
   </section>

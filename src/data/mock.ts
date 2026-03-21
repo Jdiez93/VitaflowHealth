@@ -1,4 +1,4 @@
-import type { NewsArticle, Product, UserRecipe, DailyLog, ChatMessage, Meal } from '@/types';
+import type { NewsArticle, Product, UserRecipe, DailyLog, ChatMessage } from '@/types';
 
 export const mockNews: NewsArticle[] = [
   {
@@ -10,6 +10,27 @@ export const mockNews: NewsArticle[] = [
     read_time: '5 min',
     date: '2026-03-20',
     source: 'Journal of Nutrition',
+    content: `La dieta mediterránea ha demostrado ser una de las más saludables del mundo. Un reciente meta-análisis publicado en el Journal of Nutrition, que incluyó más de 12,000 participantes, confirma que seguir este patrón alimentario reduce el riesgo de enfermedades cardiovasculares en un 30%.
+
+**¿Qué incluye la dieta mediterránea?**
+
+- Aceite de oliva virgen extra como grasa principal
+- Abundantes frutas y verduras frescas
+- Legumbres y cereales integrales
+- Pescado azul al menos 2-3 veces por semana
+- Frutos secos y semillas
+- Consumo moderado de lácteos fermentados
+- Reducción de carnes rojas y procesadas
+
+**Beneficios comprobados:**
+
+1. Reducción de colesterol LDL (malo) y aumento del HDL (bueno)
+2. Mejora de la presión arterial
+3. Disminución de marcadores inflamatorios
+4. Protección contra el deterioro cognitivo
+5. Control del peso corporal
+
+Los investigadores recomiendan adoptar este estilo de alimentación de forma progresiva, comenzando por sustituir las grasas saturadas por aceite de oliva y aumentando el consumo de pescado y vegetales.`,
   },
   {
     id: '2',
@@ -20,6 +41,20 @@ export const mockNews: NewsArticle[] = [
     read_time: '7 min',
     date: '2026-03-19',
     source: 'The Lancet',
+    content: `El ayuno intermitente se ha convertido en una de las estrategias nutricionales más populares. Pero, ¿qué dice realmente la ciencia?
+
+**Protocolo 16:8**
+
+El método más estudiado consiste en restringir la ingesta de alimentos a una ventana de 8 horas y ayunar las 16 restantes. Los resultados son prometedores:
+
+- Mejora de la sensibilidad a la insulina en un 20-30%
+- Activación de la autofagia (limpieza celular)
+- Reducción de marcadores inflamatorios
+- Pérdida de grasa corporal sin pérdida significativa de masa muscular
+
+**Precauciones importantes:**
+
+No es recomendable para embarazadas, personas con trastornos alimentarios o diabetes tipo 1 sin supervisión médica. Lo ideal es consultar con un profesional antes de comenzar.`,
   },
   {
     id: '3',
@@ -30,6 +65,23 @@ export const mockNews: NewsArticle[] = [
     read_time: '6 min',
     date: '2026-03-18',
     source: 'Nature Medicine',
+    content: `Tu intestino alberga billones de microorganismos que juegan un papel fundamental en tu salud. La microbiota intestinal influye directamente en tu sistema inmune, estado de ánimo y metabolismo.
+
+**Alimentos probióticos recomendados:**
+- Yogur natural sin azúcar
+- Kéfir
+- Chucrut y kimchi
+- Kombucha
+- Miso y tempeh
+
+**Alimentos prebióticos (alimentan a tus bacterias buenas):**
+- Plátano verde
+- Ajo y cebolla
+- Alcachofa
+- Espárragos
+- Avena
+
+Mantener una microbiota diversa es clave para una salud óptima. La recomendación es consumir al menos 30 plantas diferentes por semana.`,
   },
   {
     id: '4',
@@ -40,16 +92,36 @@ export const mockNews: NewsArticle[] = [
     read_time: '4 min',
     date: '2026-03-17',
     source: 'Sports Science Review',
+    content: `Cada vez más deportistas optan por fuentes de proteína vegetal. La ciencia demuestra que es perfectamente posible cubrir las necesidades proteicas con una dieta basada en plantas.
+
+**Mejores fuentes de proteína vegetal:**
+- Lentejas: 25g de proteína por 100g
+- Garbanzos: 19g por 100g
+- Tofu: 15g por 100g
+- Tempeh: 20g por 100g
+- Quinoa: 14g por 100g
+- Semillas de cáñamo: 31g por 100g
+
+**Combinaciones inteligentes:**
+Arroz + lentejas, pan integral + hummus, tofu + quinoa. Estas combinaciones aseguran un perfil completo de aminoácidos esenciales.`,
   },
 ];
 
-export const mockProducts: Product[] = [
-  { id: '1', name: 'Açaí Bowl Orgánico', description: 'Mezcla rica en antioxidantes con frutas frescas', image_url: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400', category: 'Superfoods', rating: 4.8 },
-  { id: '2', name: 'Matcha Premium Grade', description: 'Té verde en polvo ceremonial de Kioto', image_url: 'https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=400', category: 'Bebidas', rating: 4.9 },
-  { id: '3', name: 'Semillas de Chía', description: 'Fuente natural de omega-3 y fibra soluble', image_url: 'https://images.unsplash.com/photo-1514517521153-1be72277b32f?w=400', category: 'Semillas', rating: 4.7 },
-  { id: '4', name: 'Granola Artesanal', description: 'Sin azúcar añadida con frutos secos y coco', image_url: 'https://images.unsplash.com/photo-1517093157656-b9eccef91cb1?w=400', category: 'Cereales', rating: 4.6 },
-  { id: '5', name: 'Kombucha Natural', description: 'Bebida probiótica fermentada artesanalmente', image_url: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400', category: 'Bebidas', rating: 4.5 },
-  { id: '6', name: 'Aguacate Hass', description: 'Grasas saludables y potasio en cada porción', image_url: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400', category: 'Frescos', rating: 4.8 },
+export interface ProductDetail extends Product {
+  ingredients: string[];
+  nutritionPer100g: { calories: number; protein: number; carbs: number; fats: number; fiber: number };
+  benefits: string[];
+}
+
+export const mockProducts: ProductDetail[] = [
+  { id: '1', name: 'Açaí Bowl Orgánico', description: 'Mezcla rica en antioxidantes con frutas frescas y granola crujiente', image_url: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400', category: 'Superfoods', rating: 4.8, ingredients: ['Açaí liofilizado', 'Plátano', 'Arándanos', 'Granola artesanal', 'Miel de abeja', 'Coco rallado'], nutritionPer100g: { calories: 165, protein: 3, carbs: 28, fats: 5, fiber: 4 }, benefits: ['Alto en antioxidantes', 'Fuente de vitamina C', 'Energía natural'] },
+  { id: '2', name: 'Matcha Premium Grade', description: 'Té verde en polvo ceremonial de Kioto, rico en L-teanina', image_url: 'https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=400', category: 'Bebidas', rating: 4.9, ingredients: ['Hojas de té verde molidas', 'Origen: Uji, Kioto'], nutritionPer100g: { calories: 324, protein: 30, carbs: 39, fats: 5, fiber: 39 }, benefits: ['Concentración y calma', 'Metabolismo activo', 'Rico en catequinas'] },
+  { id: '3', name: 'Semillas de Chía', description: 'Fuente natural de omega-3, fibra soluble y proteína vegetal', image_url: 'https://images.unsplash.com/photo-1514517521153-1be72277b32f?w=400', category: 'Semillas', rating: 4.7, ingredients: ['Semillas de chía orgánicas 100%'], nutritionPer100g: { calories: 486, protein: 17, carbs: 42, fats: 31, fiber: 34 }, benefits: ['Omega-3 vegetal', 'Saciedad prolongada', 'Salud digestiva'] },
+  { id: '4', name: 'Granola Artesanal', description: 'Sin azúcar añadida, con frutos secos, coco y canela', image_url: 'https://images.unsplash.com/photo-1517093157656-b9eccef91cb1?w=400', category: 'Cereales', rating: 4.6, ingredients: ['Avena integral', 'Almendras', 'Nueces', 'Coco rallado', 'Semillas de girasol', 'Canela', 'Aceite de coco'], nutritionPer100g: { calories: 420, protein: 12, carbs: 55, fats: 18, fiber: 8 }, benefits: ['Energía sostenida', 'Sin azúcar añadida', 'Rica en fibra'] },
+  { id: '5', name: 'Kombucha Natural', description: 'Bebida probiótica fermentada artesanalmente con SCOBY vivo', image_url: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400', category: 'Bebidas', rating: 4.5, ingredients: ['Té verde', 'Azúcar de caña (fermentada)', 'Cultivo SCOBY', 'Jengibre fresco'], nutritionPer100g: { calories: 15, protein: 0, carbs: 3, fats: 0, fiber: 0 }, benefits: ['Probióticos naturales', 'Mejora digestión', 'Bajo en calorías'] },
+  { id: '6', name: 'Aguacate Hass', description: 'Grasas monoinsaturadas, potasio y vitamina E en cada porción', image_url: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400', category: 'Frescos', rating: 4.8, ingredients: ['Aguacate Hass 100% natural'], nutritionPer100g: { calories: 160, protein: 2, carbs: 9, fats: 15, fiber: 7 }, benefits: ['Grasas saludables', 'Rico en potasio', 'Salud cardiovascular'] },
+  { id: '7', name: 'Espirulina en Polvo', description: 'Microalga con 60% proteína y hierro biodisponible', image_url: 'https://images.unsplash.com/photo-1622485831930-8e3e0e38f3ad?w=400', category: 'Superfoods', rating: 4.6, ingredients: ['Espirulina orgánica deshidratada'], nutritionPer100g: { calories: 290, protein: 57, carbs: 24, fats: 8, fiber: 4 }, benefits: ['Proteína completa', 'Rico en hierro', 'Desintoxicante natural'] },
+  { id: '8', name: 'Mantequilla de Almendras', description: 'Crema 100% almendras tostadas sin aditivos ni azúcar', image_url: 'https://images.unsplash.com/photo-1612187209234-a05a44891aab?w=400', category: 'Untables', rating: 4.7, ingredients: ['Almendras tostadas 100%'], nutritionPer100g: { calories: 614, protein: 21, carbs: 19, fats: 56, fiber: 10 }, benefits: ['Vitamina E', 'Magnesio', 'Grasas mono-insaturadas'] },
 ];
 
 export const mockRecipes: UserRecipe[] = [
