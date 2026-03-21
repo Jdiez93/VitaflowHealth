@@ -44,12 +44,15 @@ const Dashboard = () => {
     { label: 'Grasas', value: mockTodayLog.fats, goal: fatsGoal, color: 'bg-amber-500' },
   ];
 
+  const { profile } = useAuth();
+  const displayName = profile?.full_name || 'Usuario';
+
   return (
     <div className="min-h-screen bg-background">
-      <Header isAuthenticated userName="Carlos" />
+      <Header />
       <main className="pt-20 pb-10 container mx-auto px-4">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="font-display font-bold text-2xl md:text-3xl mb-1">Buenos días, Carlos 👋</h1>
+          <h1 className="font-display font-bold text-2xl md:text-3xl mb-1">Buenos días, {displayName} 👋</h1>
           <p className="text-muted-foreground text-sm mb-8">Aquí tienes tu resumen del día</p>
         </motion.div>
 
