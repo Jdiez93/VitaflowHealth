@@ -6,6 +6,7 @@ import { Flame, Droplets, Footprints, Target, Plus, Send, MessageCircle, X } fro
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { ChatMessage } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 
 const Dashboard = () => {
   const [waterMl, setWaterMl] = useState(mockTodayLog.water_ml);
