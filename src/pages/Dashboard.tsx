@@ -1,24 +1,103 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Header from '@/components/layout/Header';
-import { mockTodayLog, calorieGoal, waterGoal, stepsGoal, proteinGoal, carbsGoal, fatsGoal, mockChatMessages } from '@/data/mock';
-import { Flame, Droplets, Footprints, Target, Plus, Send, MessageCircle, X } from 'lucide-react';
+import { Flame, Droplets, Footprints, Target, Plus, Send, MessageCircle, X, CalendarDays, AlertCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { ChatMessage } from '@/types';
+import type { ChatMessage, Meal } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
+import { useDailyLog } from '@/hooks/useDailyLog';
+import { calculateCalories } from '@/lib/calories';
+import { mockChatMessages } from '@/data/mock';
+import { useToast } from '@/hooks/use-toast';
+
+// Simple food database for estimating nutrition
+const FOOD_DB: Record<string, Omit<Meal, 'name' | 'time'>> = {
+  'ensalada': { calories: 250, protein: 8, carbs: 15, fats: 18 },
+  'pollo': { calories: 350, protein: 35, carbs: 5, fats: 12 },
+  'arroz': { calories: 200, protein: 4, carbs: 45, fats: 1 },
+  'huevos': { calories: 280, protein: 18, carbs: 2, fats: 20 },
+  'avena': { calories: 300, protein: 10, carbs: 52, fats: 6 },
+  'yogur': { calories: 150, protein: 12, carbs: 18, fats: 4 },
+  'fruta': { calories: 120, protein: 1, carbs: 30, fats: 0 },
+  'salmón': { calories: 400, protein: 38, carbs: 0, fats: 22 },
+  'pasta': { calories: 380, protein: 12, carbs: 70, fats: 5 },
+  'tostada': { calories: 250, protein: 8, carbs: 35, fats: 8 },
+  'batido': { calories: 220, protein: 15, carbs: 30, fats: 5 },
+  'sandwich': { calories: 400, protein: 20, carbs: 40, fats: 15 },
+  'sopa': { calories: 180, protein: 10, carbs: 25, fats: 5 },
+  'carne': { calories: 400, protein: 35, carbs: 0, fats: 25 },
+  'pescado': { calories: 300, protein: 30, carbs: 2, fats: 15 },
+};
+
+function estimateNutrition(name: string): Omit<Meal, 'name' | 'time'> {
+  const lower = name.toLowerCase();
+  for (const [key, val] of Object.entries(FOOD_DB)) {
+    if (lower.includes(key)) return val;
+  }
+  // Fallback
+  return { calories: 300, protein: 15, carbs: 35, fats: 12 };
+}
+
+function formatDateES(dateStr: string): string {
+  const d = new Date(dateStr + 'T12:00:00');
+  return d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function getDateStr(offset: number = 0): string {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().split('T')[0];
+}
 
 const Dashboard = () => {
-  const [waterMl, setWaterMl] = useState(mockTodayLog.water_ml);
+  const { profile } = useAuth();
+  const { toast } = useToast();
+  const [dateOffset, setDateOffset] = useState(0);
+  const selectedDate = getDateStr(dateOffset);
+  const isToday = dateOffset === 0;
+
+  const { log, loading, addMeal, addWater } = useDailyLog(selectedDate);
+
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(mockChatMessages);
   const [chatInput, setChatInput] = useState('');
   const [mealInput, setMealInput] = useState('');
+  const [addingMeal, setAddingMeal] = useState(false);
 
-  const calPercent = Math.round((mockTodayLog.calories / calorieGoal) * 100);
-  const waterPercent = Math.round((waterMl / waterGoal) * 100);
+  const calorieData = useMemo(() => calculateCalories({
+    weight: profile?.weight ? Number(profile.weight) : null,
+    height: profile?.height ? Number(profile.height) : null,
+    age: profile?.age ?? null,
+    sex: profile?.sex ?? null,
+    goal: profile?.goal ?? null,
+  }), [profile]);
 
-  const addWater = (ml: number) => setWaterMl(prev => Math.min(prev + ml, waterGoal));
+  const calPercent = calorieData.dailyCalories > 0 ? Math.min(Math.round((log.calories / calorieData.dailyCalories) * 100), 100) : 0;
+  const waterGoal = 2500;
+  const waterPercent = Math.min(Math.round((log.water_ml / waterGoal) * 100), 100);
+  const stepsGoal = 10000;
+
+  const displayName = profile?.full_name || 'Usuario';
+  const goalLabels: Record<string, string> = { lose_fat: 'Perder grasa', gain_muscle: 'Ganar músculo', maintain: 'Mantenerme' };
+
+  const handleAddMeal = async () => {
+    if (!mealInput.trim()) {
+      toast({ title: 'Escribe una comida', description: 'El campo no puede estar vacío.', variant: 'destructive' });
+      return;
+    }
+    setAddingMeal(true);
+    const nutrition = estimateNutrition(mealInput);
+    const meal: Meal = {
+      name: mealInput.trim(),
+      ...nutrition,
+      time: new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }),
+    };
+    await addMeal(meal);
+    setMealInput('');
+    toast({ title: 'Comida registrada', description: `${meal.name} — ${meal.calories} kcal` });
+    setAddingMeal(false);
+  };
 
   const handleChatSend = () => {
     if (!chatInput.trim()) return;
@@ -32,114 +111,163 @@ const Dashboard = () => {
   };
 
   const summaryCards = [
-    { icon: Flame, label: 'Calorías', value: `${mockTodayLog.calories}`, sub: `/ ${calorieGoal} kcal`, color: 'text-primary' },
-    { icon: Droplets, label: 'Agua', value: `${waterMl}`, sub: `/ ${waterGoal} ml`, color: 'text-blue-500' },
-    { icon: Footprints, label: 'Pasos', value: `${mockTodayLog.steps.toLocaleString()}`, sub: `/ ${stepsGoal.toLocaleString()}`, color: 'text-orange-500' },
-    { icon: Target, label: 'Objetivo', value: 'Perder grasa', sub: 'En progreso', color: 'text-primary' },
+    { icon: Flame, label: 'Calorías', value: `${log.calories}`, sub: `/ ${calorieData.dailyCalories} kcal`, color: 'text-primary' },
+    { icon: Droplets, label: 'Agua', value: `${log.water_ml}`, sub: `/ ${waterGoal} ml`, color: 'text-blue-500' },
+    { icon: Footprints, label: 'Pasos', value: `${log.steps.toLocaleString()}`, sub: `/ ${stepsGoal.toLocaleString()}`, color: 'text-orange-500' },
+    { icon: Target, label: 'Objetivo', value: goalLabels[profile?.goal || ''] || '—', sub: calorieData.complete ? `TMB: ${calorieData.tmb}` : 'Completa tu perfil', color: 'text-primary' },
   ];
 
   const macros = [
-    { label: 'Proteínas', value: mockTodayLog.protein, goal: proteinGoal, color: 'bg-primary' },
-    { label: 'Carbos', value: mockTodayLog.carbs, goal: carbsGoal, color: 'bg-secondary' },
-    { label: 'Grasas', value: mockTodayLog.fats, goal: fatsGoal, color: 'bg-amber-500' },
+    { label: 'Proteínas', value: log.protein, goal: calorieData.protein, color: 'bg-primary' },
+    { label: 'Carbos', value: log.carbs, goal: calorieData.carbs, color: 'bg-secondary' },
+    { label: 'Grasas', value: log.fats, goal: calorieData.fats, color: 'bg-amber-500' },
   ];
-
-  const { profile } = useAuth();
-  const displayName = profile?.full_name || 'Usuario';
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="pt-20 pb-10 container mx-auto px-4">
+        {/* Greeting + Date */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="font-display font-bold text-2xl md:text-3xl mb-1">Buenos días, {displayName} 👋</h1>
-          <p className="text-muted-foreground text-sm mb-8">Aquí tienes tu resumen del día</p>
+          <h1 className="font-display font-bold text-2xl md:text-3xl mb-1">
+            {isToday ? `Buenos días, ${displayName} 👋` : displayName}
+          </h1>
+          <div className="flex items-center gap-3 mb-2">
+            <CalendarDays className="w-4 h-4 text-primary" />
+            <span className="text-sm text-muted-foreground capitalize">{formatDateES(selectedDate)}</span>
+          </div>
+          {/* Date nav */}
+          <div className="flex items-center gap-2 mb-6">
+            <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8" onClick={() => setDateOffset(d => d - 1)}>
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button variant={isToday ? 'default' : 'outline'} size="sm" className="rounded-xl text-xs" onClick={() => setDateOffset(0)}>Hoy</Button>
+            <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8" onClick={() => setDateOffset(d => Math.min(d + 1, 0))} disabled={isToday}>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {!calorieData.complete && (
+            <div className="flex items-center gap-2 p-3 mb-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              Completa tu perfil (peso, altura, edad, sexo) para calcular tus calorías personalizadas.
+            </div>
+          )}
         </motion.div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {summaryCards.map((card, i) => (
-            <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card p-5">
-              <card.icon className={`w-5 h-5 ${card.color} mb-3`} />
-              <p className="text-xs text-muted-foreground">{card.label}</p>
-              <p className="font-display font-bold text-xl">{card.value}</p>
-              <p className="text-xs text-muted-foreground">{card.sub}</p>
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Calorie Tracker */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-2 glass-card p-6">
-            <h2 className="font-display font-semibold text-lg mb-4">AI Calorie Tracker</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="relative w-40 h-40 mx-auto md:mx-0 flex-shrink-0">
-                <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                  <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(140, 15%, 90%)" strokeWidth="8" />
-                  <circle cx="50" cy="50" r="40" fill="none" stroke="url(#gradD)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${calPercent * 2.51} ${251 - calPercent * 2.51}`} />
-                  <defs><linearGradient id="gradD" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="hsl(160, 84%, 30%)" /><stop offset="100%" stopColor="hsl(143, 64%, 24%)" /></linearGradient></defs>
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="font-display font-bold text-lg">{calorieGoal - mockTodayLog.calories}</span>
-                  <span className="text-[10px] text-muted-foreground">restantes</span>
-                </div>
-              </div>
-              <div className="flex-1 space-y-4">
-                <div className="grid grid-cols-3 gap-3">
-                  {macros.map((m) => (
-                    <div key={m.label} className="text-center p-3 rounded-2xl bg-muted/50">
-                      <div className="text-xs text-muted-foreground">{m.label}</div>
-                      <div className="font-display font-bold">{m.value}g</div>
-                      <div className="w-full h-1.5 bg-muted rounded-full mt-2 overflow-hidden">
-                        <div className={`h-full rounded-full ${m.color}`} style={{ width: `${Math.min((m.value / m.goal) * 100, 100)}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <Input placeholder="Ej: Ensalada de pollo con arroz" value={mealInput} onChange={e => setMealInput(e.target.value)} className="rounded-xl flex-1" />
-                  <Button size="sm" className="rounded-xl bio-gradient border-0 text-primary-foreground gap-1"><Plus className="w-4 h-4" /> Añadir</Button>
-                </div>
-                {/* Meals list */}
-                <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {mockTodayLog.meals_json.map((meal, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 text-sm">
-                      <div>
-                        <span className="font-medium">{meal.name}</span>
-                        <span className="text-xs text-muted-foreground ml-2">{meal.time}</span>
-                      </div>
-                      <span className="text-xs font-medium text-primary">{meal.calories} kcal</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Hydration */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-6">
-            <h2 className="font-display font-semibold text-lg mb-4">Hydration Wave 💧</h2>
-            <div className="relative w-32 h-48 mx-auto mb-4 rounded-3xl border-2 border-blue-200 overflow-hidden bg-blue-50/30">
-              <motion.div
-                className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-400 to-blue-300 rounded-b-3xl"
-                initial={{ height: 0 }}
-                animate={{ height: `${waterPercent}%` }}
-                transition={{ duration: 1, ease: 'easeOut' }}
-              />
-              <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-                <span className="font-display font-bold text-lg">{waterPercent}%</span>
-                <span className="text-[10px] text-muted-foreground">{waterMl} ml</span>
-              </div>
-            </div>
-            <div className="flex gap-2 justify-center">
-              {[250, 500].map((ml) => (
-                <Button key={ml} variant="outline" size="sm" onClick={() => addWater(ml)} className="rounded-xl text-xs gap-1">
-                  <Plus className="w-3 h-3" /> {ml} ml
-                </Button>
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        ) : (
+          <>
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              {summaryCards.map((card, i) => (
+                <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card p-5">
+                  <card.icon className={`w-5 h-5 ${card.color} mb-3`} />
+                  <p className="text-xs text-muted-foreground">{card.label}</p>
+                  <p className="font-display font-bold text-xl">{card.value}</p>
+                  <p className="text-xs text-muted-foreground">{card.sub}</p>
+                </motion.div>
               ))}
             </div>
-          </motion.div>
-        </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Calorie Tracker */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-2 glass-card p-6">
+                <h2 className="font-display font-semibold text-lg mb-4">AI Calorie Tracker</h2>
+                <div className="flex flex-col md:flex-row gap-6">
+                  <div className="relative w-40 h-40 mx-auto md:mx-0 flex-shrink-0">
+                    <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                      <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="8" />
+                      <circle cx="50" cy="50" r="40" fill="none" stroke="url(#gradD)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${calPercent * 2.51} ${251 - calPercent * 2.51}`} />
+                      <defs><linearGradient id="gradD" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="hsl(var(--primary))" /><stop offset="100%" stopColor="hsl(var(--secondary))" /></linearGradient></defs>
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="font-display font-bold text-lg">{Math.max(calorieData.dailyCalories - log.calories, 0)}</span>
+                      <span className="text-[10px] text-muted-foreground">restantes</span>
+                    </div>
+                  </div>
+                  <div className="flex-1 space-y-4">
+                    <div className="grid grid-cols-3 gap-3">
+                      {macros.map((m) => (
+                        <div key={m.label} className="text-center p-3 rounded-2xl bg-muted/50">
+                          <div className="text-xs text-muted-foreground">{m.label}</div>
+                          <div className="font-display font-bold">{m.value}g</div>
+                          <div className="text-[10px] text-muted-foreground">/ {m.goal}g</div>
+                          <div className="w-full h-1.5 bg-muted rounded-full mt-2 overflow-hidden">
+                            <div className={`h-full rounded-full ${m.color}`} style={{ width: `${Math.min((m.value / m.goal) * 100, 100)}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {isToday && (
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Ej: Ensalada de pollo con arroz"
+                          value={mealInput}
+                          onChange={e => setMealInput(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && handleAddMeal()}
+                          className="rounded-xl flex-1"
+                        />
+                        <Button size="sm" onClick={handleAddMeal} disabled={addingMeal} className="rounded-xl bio-gradient border-0 text-primary-foreground gap-1">
+                          {addingMeal ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Añadir
+                        </Button>
+                      </div>
+                    )}
+                    {/* Meals list */}
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {log.meals_json.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          {isToday ? 'Todavía no has registrado comidas hoy' : 'Sin comidas registradas este día'}
+                        </p>
+                      ) : (
+                        log.meals_json.map((meal, i) => (
+                          <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 text-sm">
+                            <div>
+                              <span className="font-medium">{meal.name}</span>
+                              <span className="text-xs text-muted-foreground ml-2">{meal.time}</span>
+                            </div>
+                            <span className="text-xs font-medium text-primary">{meal.calories} kcal</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Hydration */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-6">
+                <h2 className="font-display font-semibold text-lg mb-4">Hydration Wave 💧</h2>
+                <div className="relative w-32 h-48 mx-auto mb-4 rounded-3xl border-2 border-blue-200 overflow-hidden bg-blue-50/30">
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-400 to-blue-300 rounded-b-3xl"
+                    initial={{ height: 0 }}
+                    animate={{ height: `${waterPercent}%` }}
+                    transition={{ duration: 1, ease: 'easeOut' }}
+                  />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                    <span className="font-display font-bold text-lg">{waterPercent}%</span>
+                    <span className="text-[10px] text-muted-foreground">{log.water_ml} ml</span>
+                  </div>
+                </div>
+                {log.water_ml === 0 && !isToday ? (
+                  <p className="text-xs text-muted-foreground text-center">Aún no has añadido agua</p>
+                ) : (
+                  <div className="flex gap-2 justify-center">
+                    {isToday && [250, 500].map((ml) => (
+                      <Button key={ml} variant="outline" size="sm" onClick={() => addWater(ml)} className="rounded-xl text-xs gap-1">
+                        <Plus className="w-3 h-3" /> {ml} ml
+                      </Button>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            </div>
+          </>
+        )}
       </main>
 
       {/* AI Chat Floating */}
