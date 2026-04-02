@@ -74,7 +74,7 @@ export function useDailyLog(date: string) {
       fats: newLog.fats,
       water_ml: newLog.water_ml,
       steps: newLog.steps,
-      meals_json: newLog.meals_json as unknown as Record<string, unknown>[],
+      meals_json: JSON.parse(JSON.stringify(newLog.meals_json)),
     };
 
     if (log.id) {
