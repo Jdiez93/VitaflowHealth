@@ -148,8 +148,8 @@ const Dashboard = () => {
           </div>
 
           {!calorieData.complete && (
-            <div className="flex items-center gap-2 p-3 mb-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <div className="flex items-center gap-2 p-3 mb-6 rounded-2xl bg-accent border border-border text-foreground text-sm">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 text-primary" />
               Completa tu perfil (peso, altura, edad, sexo) para calcular tus calorías personalizadas.
             </div>
           )}
