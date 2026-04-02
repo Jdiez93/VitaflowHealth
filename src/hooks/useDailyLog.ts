@@ -67,7 +67,7 @@ export function useDailyLog(date: string) {
     const newLog = { ...log, ...updates };
     setLog(newLog);
 
-    const mealsJson = JSON.parse(JSON.stringify(newLog.meals_json)) as unknown[];
+    const mealsJson = JSON.parse(JSON.stringify(newLog.meals_json)) as Json;
     const payload = {
       date,
       calories: newLog.calories,
