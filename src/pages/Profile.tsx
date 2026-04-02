@@ -124,7 +124,7 @@ const Profile = () => {
               <Input type="number" value={height} onChange={e => setHeight(e.target.value)} placeholder="Ej: 175" className="rounded-xl mt-1" />
             </div>
             <div>
-              <Label className="text-sm flex items-center gap-1 mb-1"><Venus className="w-3 h-3" /> Sexo</Label>
+              <Label className="text-sm flex items-center gap-1 mb-1"><Users className="w-3 h-3" /> Sexo</Label>
               <div className="flex gap-2 mt-1">
                 {sexOptions.map(s => (
                   <button

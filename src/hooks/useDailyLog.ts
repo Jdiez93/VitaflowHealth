@@ -80,7 +80,7 @@ export function useDailyLog(date: string) {
     if (log.id) {
       await supabase.from('daily_logs').update(payload).eq('id', log.id);
     } else {
-      const { data } = await supabase.from('daily_logs').insert(payload).select('id').single();
+      const { data } = await supabase.from('daily_logs').insert({ ...payload, user_id: user.id }).select('id').single();
       if (data) setLog(prev => ({ ...prev, id: data.id }));
     }
   }, [user, date, log]);
