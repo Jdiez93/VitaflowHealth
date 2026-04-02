@@ -65,8 +65,8 @@ export function useDailyLog(date: string) {
     const newLog = { ...log, ...updates };
     setLog(newLog);
 
+    const mealsJson = JSON.parse(JSON.stringify(newLog.meals_json)) as unknown[];
     const payload = {
-      user_id: user.id,
       date,
       calories: newLog.calories,
       protein: newLog.protein,
@@ -74,7 +74,7 @@ export function useDailyLog(date: string) {
       fats: newLog.fats,
       water_ml: newLog.water_ml,
       steps: newLog.steps,
-      meals_json: JSON.parse(JSON.stringify(newLog.meals_json)),
+      meals_json: mealsJson,
     };
 
     if (log.id) {
