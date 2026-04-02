@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Header from '@/components/layout/Header';
-import { User, Mail, Ruler, Weight, Calendar, Target, Venus, Loader2 } from 'lucide-react';
+import { User, Mail, Ruler, Weight, Calendar, Target, Users, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
