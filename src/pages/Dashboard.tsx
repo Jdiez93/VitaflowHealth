@@ -11,32 +11,57 @@ import { calculateCalories } from '@/lib/calories';
 import { mockChatMessages } from '@/data/mock';
 import { useToast } from '@/hooks/use-toast';
 
-// Simple food database for estimating nutrition
-const FOOD_DB: Record<string, Omit<Meal, 'name' | 'time'>> = {
-  'ensalada': { calories: 250, protein: 8, carbs: 15, fats: 18 },
-  'pollo': { calories: 350, protein: 35, carbs: 5, fats: 12 },
-  'arroz': { calories: 200, protein: 4, carbs: 45, fats: 1 },
-  'huevos': { calories: 280, protein: 18, carbs: 2, fats: 20 },
-  'avena': { calories: 300, protein: 10, carbs: 52, fats: 6 },
-  'yogur': { calories: 150, protein: 12, carbs: 18, fats: 4 },
-  'fruta': { calories: 120, protein: 1, carbs: 30, fats: 0 },
-  'salmón': { calories: 400, protein: 38, carbs: 0, fats: 22 },
-  'pasta': { calories: 380, protein: 12, carbs: 70, fats: 5 },
-  'tostada': { calories: 250, protein: 8, carbs: 35, fats: 8 },
-  'batido': { calories: 220, protein: 15, carbs: 30, fats: 5 },
-  'sandwich': { calories: 400, protein: 20, carbs: 40, fats: 15 },
-  'sopa': { calories: 180, protein: 10, carbs: 25, fats: 5 },
-  'carne': { calories: 400, protein: 35, carbs: 0, fats: 25 },
-  'pescado': { calories: 300, protein: 30, carbs: 2, fats: 15 },
+// Nutrition per 100g database
+interface NutritionPer100g {
+  calories: number; protein: number; carbs: number; fats: number;
+}
+
+const FOOD_DB: Record<string, NutritionPer100g> = {
+  'ensalada': { calories: 65, protein: 3, carbs: 5, fats: 4 },
+  'pollo': { calories: 165, protein: 31, carbs: 0, fats: 4 },
+  'arroz': { calories: 130, protein: 2.7, carbs: 28, fats: 0.3 },
+  'huevos': { calories: 155, protein: 13, carbs: 1, fats: 11 },
+  'avena': { calories: 389, protein: 17, carbs: 66, fats: 7 },
+  'yogur': { calories: 59, protein: 10, carbs: 4, fats: 0.7 },
+  'fruta': { calories: 52, protein: 0.3, carbs: 14, fats: 0.2 },
+  'salmón': { calories: 208, protein: 20, carbs: 0, fats: 13 },
+  'pasta': { calories: 131, protein: 5, carbs: 25, fats: 1 },
+  'tostada': { calories: 265, protein: 9, carbs: 49, fats: 3 },
+  'batido': { calories: 80, protein: 5, carbs: 12, fats: 2 },
+  'sandwich': { calories: 250, protein: 12, carbs: 28, fats: 10 },
+  'sopa': { calories: 40, protein: 2, carbs: 6, fats: 1 },
+  'carne': { calories: 250, protein: 26, carbs: 0, fats: 17 },
+  'pescado': { calories: 140, protein: 20, carbs: 0, fats: 6 },
+  'pan': { calories: 265, protein: 9, carbs: 49, fats: 3 },
+  'queso': { calories: 350, protein: 25, carbs: 1, fats: 27 },
+  'leche': { calories: 42, protein: 3.4, carbs: 5, fats: 1 },
+  'plátano': { calories: 89, protein: 1, carbs: 23, fats: 0.3 },
+  'aguacate': { calories: 160, protein: 2, carbs: 9, fats: 15 },
 };
 
-function estimateNutrition(name: string): Omit<Meal, 'name' | 'time'> {
+function estimateNutrition(name: string, quantity: number): Omit<Meal, 'name' | 'time'> {
   const lower = name.toLowerCase();
+  const factor = quantity / 100;
   for (const [key, val] of Object.entries(FOOD_DB)) {
-    if (lower.includes(key)) return val;
+    if (lower.includes(key)) {
+      return {
+        quantity, unit: 'g',
+        calories: Math.round(val.calories * factor),
+        protein: Math.round(val.protein * factor),
+        carbs: Math.round(val.carbs * factor),
+        fats: Math.round(val.fats * factor),
+      };
+    }
   }
-  // Fallback
-  return { calories: 300, protein: 15, carbs: 35, fats: 12 };
+  // Fallback: ~200kcal per 100g
+  const fb: NutritionPer100g = { calories: 200, protein: 10, carbs: 25, fats: 8 };
+  return {
+    quantity, unit: 'g',
+    calories: Math.round(fb.calories * factor),
+    protein: Math.round(fb.protein * factor),
+    carbs: Math.round(fb.carbs * factor),
+    fats: Math.round(fb.fats * factor),
+  };
 }
 
 function formatDateES(dateStr: string): string {
