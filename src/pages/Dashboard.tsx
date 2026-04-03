@@ -235,17 +235,29 @@ const Dashboard = () => {
                       ))}
                     </div>
                     {isToday && (
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Ej: Ensalada de pollo con arroz"
-                          value={mealInput}
-                          onChange={e => setMealInput(e.target.value)}
-                          onKeyDown={e => e.key === 'Enter' && handleAddMeal()}
-                          className="rounded-xl flex-1"
-                        />
-                        <Button size="sm" onClick={handleAddMeal} disabled={addingMeal} className="rounded-xl bio-gradient border-0 text-primary-foreground gap-1">
-                          {addingMeal ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Añadir
-                        </Button>
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Ej: Pollo, arroz, ensalada..."
+                            value={mealInput}
+                            onChange={e => setMealInput(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && handleAddMeal()}
+                            className="rounded-xl flex-1"
+                          />
+                          <Input
+                            type="number"
+                            placeholder="g"
+                            value={mealQuantity}
+                            onChange={e => setMealQuantity(e.target.value)}
+                            className="rounded-xl w-20 text-center"
+                            min={1}
+                            max={5000}
+                          />
+                          <Button size="sm" onClick={handleAddMeal} disabled={addingMeal} className="rounded-xl bio-gradient border-0 text-primary-foreground gap-1">
+                            {addingMeal ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Añadir
+                          </Button>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">Indica el alimento y la cantidad en gramos para un cálculo más preciso.</p>
                       </div>
                     )}
                     {/* Meals list */}
@@ -259,7 +271,7 @@ const Dashboard = () => {
                           <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 text-sm">
                             <div>
                               <span className="font-medium">{meal.name}</span>
-                              <span className="text-xs text-muted-foreground ml-2">{meal.time}</span>
+                              <span className="text-xs text-muted-foreground ml-2">{meal.quantity ?? ''}{'unit' in meal ? (meal.unit || 'g') : 'g'} · {meal.time}</span>
                             </div>
                             <span className="text-xs font-medium text-primary">{meal.calories} kcal</span>
                           </div>
