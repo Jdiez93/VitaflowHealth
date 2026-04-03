@@ -59,6 +59,51 @@ export type Database = {
         }
         Relationships: []
       }
+      news: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          id: string
+          image_url: string
+          is_active: boolean
+          published_at: string
+          read_time: string
+          source: string
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          published_at?: string
+          read_time?: string
+          source?: string
+          summary?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          published_at?: string
+          read_time?: string
+          source?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
@@ -104,6 +149,66 @@ export type Database = {
           updated_at?: string
           user_id?: string
           weight?: number | null
+        }
+        Relationships: []
+      }
+      recipes: {
+        Row: {
+          calories: number
+          carbs: number
+          category: string
+          created_at: string
+          description: string
+          fats: number
+          id: string
+          image_url: string
+          ingredients: Json
+          is_active: boolean
+          protein: number
+          published_at: string
+          steps: Json
+          tags: Json
+          time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          calories?: number
+          carbs?: number
+          category?: string
+          created_at?: string
+          description?: string
+          fats?: number
+          id?: string
+          image_url?: string
+          ingredients?: Json
+          is_active?: boolean
+          protein?: number
+          published_at?: string
+          steps?: Json
+          tags?: Json
+          time?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          calories?: number
+          carbs?: number
+          category?: string
+          created_at?: string
+          description?: string
+          fats?: number
+          id?: string
+          image_url?: string
+          ingredients?: Json
+          is_active?: boolean
+          protein?: number
+          published_at?: string
+          steps?: Json
+          tags?: Json
+          time?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
