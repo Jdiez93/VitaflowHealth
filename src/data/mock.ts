@@ -142,10 +142,10 @@ export const mockTodayLog: DailyLog = {
   water_ml: 1500,
   steps: 7200,
   meals_json: [
-    { name: 'Avena con frutas', calories: 380, protein: 12, carbs: 58, fats: 10, time: '08:00' },
-    { name: 'Ensalada César', calories: 520, protein: 35, carbs: 28, fats: 30, time: '13:00' },
-    { name: 'Yogur con nueces', calories: 250, protein: 18, carbs: 20, fats: 12, time: '16:30' },
-    { name: 'Pollo a la plancha', calories: 500, protein: 30, carbs: 74, fats: 10, time: '20:00' },
+    { name: 'Avena con frutas', quantity: 200, unit: 'g', calories: 380, protein: 12, carbs: 58, fats: 10, time: '08:00' },
+    { name: 'Ensalada César', quantity: 300, unit: 'g', calories: 520, protein: 35, carbs: 28, fats: 30, time: '13:00' },
+    { name: 'Yogur con nueces', quantity: 150, unit: 'g', calories: 250, protein: 18, carbs: 20, fats: 12, time: '16:30' },
+    { name: 'Pollo a la plancha', quantity: 250, unit: 'g', calories: 500, protein: 30, carbs: 74, fats: 10, time: '20:00' },
   ],
   created_at: new Date().toISOString(),
 };
