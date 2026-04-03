@@ -88,6 +88,7 @@ const Dashboard = () => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(mockChatMessages);
   const [chatInput, setChatInput] = useState('');
   const [mealInput, setMealInput] = useState('');
+  const [mealQuantity, setMealQuantity] = useState('100');
   const [addingMeal, setAddingMeal] = useState(false);
 
   const calorieData = useMemo(() => calculateCalories({
