@@ -28,6 +28,8 @@ export interface DailyLog {
 
 export interface Meal {
   name: string;
+  quantity: number;   // grams, ml, or units
+  unit: string;       // 'g' | 'ml' | 'unidad'
   calories: number;
   protein: number;
   carbs: number;
