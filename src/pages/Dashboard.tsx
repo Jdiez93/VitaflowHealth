@@ -112,8 +112,13 @@ const Dashboard = () => {
       toast({ title: 'Escribe una comida', description: 'El campo no puede estar vacío.', variant: 'destructive' });
       return;
     }
+    const qty = parseInt(mealQuantity) || 100;
+    if (qty <= 0 || qty > 5000) {
+      toast({ title: 'Cantidad inválida', description: 'Introduce una cantidad entre 1 y 5000 g.', variant: 'destructive' });
+      return;
+    }
     setAddingMeal(true);
-    const nutrition = estimateNutrition(mealInput);
+    const nutrition = estimateNutrition(mealInput, qty);
     const meal: Meal = {
       name: mealInput.trim(),
       ...nutrition,
@@ -121,7 +126,8 @@ const Dashboard = () => {
     };
     await addMeal(meal);
     setMealInput('');
-    toast({ title: 'Comida registrada', description: `${meal.name} — ${meal.calories} kcal` });
+    setMealQuantity('100');
+    toast({ title: 'Comida registrada', description: `${meal.name} (${qty}g) — ${meal.calories} kcal` });
     setAddingMeal(false);
   };
 
