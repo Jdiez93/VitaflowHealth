@@ -85,7 +85,6 @@ const Dashboard = () => {
 
 
   const [mealInput, setMealInput] = useState('');
-  const [mealInput, setMealInput] = useState('');
   const [mealQuantity, setMealQuantity] = useState('100');
   const [addingMeal, setAddingMeal] = useState(false);
 
