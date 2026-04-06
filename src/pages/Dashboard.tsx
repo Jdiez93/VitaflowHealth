@@ -9,7 +9,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useDailyLog } from '@/hooks/useDailyLog';
 import { calculateCalories } from '@/lib/calories';
 import { useToast } from '@/hooks/use-toast';
-import { useToast } from '@/hooks/use-toast';
 
 // Nutrition per 100g database
 interface NutritionPer100g {
