@@ -1,14 +1,13 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Header from '@/components/layout/Header';
-import { Flame, Droplets, Footprints, Target, Plus, Send, MessageCircle, X, CalendarDays, AlertCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Flame, Droplets, Footprints, Target, Plus, CalendarDays, AlertCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { ChatMessage, Meal } from '@/types';
+import type { Meal } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useDailyLog } from '@/hooks/useDailyLog';
 import { calculateCalories } from '@/lib/calories';
-import { mockChatMessages } from '@/data/mock';
 import { useToast } from '@/hooks/use-toast';
 
 // Nutrition per 100g database
@@ -84,9 +83,7 @@ const Dashboard = () => {
 
   const { log, loading, addMeal, addWater } = useDailyLog(selectedDate);
 
-  const [chatOpen, setChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(mockChatMessages);
-  const [chatInput, setChatInput] = useState('');
+
   const [mealInput, setMealInput] = useState('');
   const [mealQuantity, setMealQuantity] = useState('100');
   const [addingMeal, setAddingMeal] = useState(false);
@@ -131,16 +128,6 @@ const Dashboard = () => {
     setAddingMeal(false);
   };
 
-  const handleChatSend = () => {
-    if (!chatInput.trim()) return;
-    const userMsg: ChatMessage = { id: Date.now().toString(), role: 'user', content: chatInput, timestamp: new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }) };
-    setChatMessages(prev => [...prev, userMsg]);
-    setChatInput('');
-    setTimeout(() => {
-      const aiMsg: ChatMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: 'Gracias por tu pregunta. Estoy procesando tu consulta para darte la mejor recomendación nutricional. 🌿', timestamp: new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }) };
-      setChatMessages(prev => [...prev, aiMsg]);
-    }, 1000);
-  };
 
   const summaryCards = [
     { icon: Flame, label: 'Calorías', value: `${log.calories}`, sub: `/ ${calorieData.dailyCalories} kcal`, color: 'text-primary' },
@@ -314,42 +301,6 @@ const Dashboard = () => {
         )}
       </main>
 
-      {/* AI Chat Floating */}
-      <div className="fixed bottom-6 right-6 z-50">
-        {chatOpen ? (
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-80 h-[28rem] glass-card flex flex-col shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bio-gradient flex items-center justify-center"><MessageCircle className="w-4 h-4 text-primary-foreground" /></div>
-                <div>
-                  <p className="text-sm font-display font-semibold">VitaFlow AI</p>
-                  <p className="text-[10px] text-muted-foreground">Asistente de nutrición</p>
-                </div>
-              </div>
-              <button onClick={() => setChatOpen(false)} className="p-1 hover:bg-muted rounded-lg"><X className="w-4 h-4" /></button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {chatMessages.map((msg) => (
-                <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm ${msg.role === 'user' ? 'bio-gradient text-primary-foreground' : 'bg-muted'}`}>
-                    {msg.content}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="p-3 border-t border-border">
-              <div className="flex gap-2">
-                <Input placeholder="Pregunta algo..." value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleChatSend()} className="rounded-xl text-sm" />
-                <Button size="sm" onClick={handleChatSend} className="rounded-xl bio-gradient border-0 text-primary-foreground"><Send className="w-4 h-4" /></Button>
-              </div>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setChatOpen(true)} className="w-14 h-14 rounded-2xl bio-gradient flex items-center justify-center shadow-lg">
-            <MessageCircle className="w-6 h-6 text-primary-foreground" />
-          </motion.button>
-        )}
-      </div>
     </div>
   );
 };

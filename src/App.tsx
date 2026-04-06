@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from '@/hooks/useAuth';
+import ChatBot from '@/components/features/ChatBot';
 
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
@@ -47,6 +48,7 @@ const App = () => (
             </Routes>
           </Suspense>
         </BrowserRouter>
+        <ChatBot />
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
