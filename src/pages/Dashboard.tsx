@@ -317,6 +317,98 @@ const Dashboard = () => {
                 )}
               </motion.div>
             </div>
+            {/* Activity Section */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-6">
+              <div className="glass-card p-6">
+                <div className="flex items-center gap-2 mb-5">
+                  <Activity className="w-5 h-5 text-primary" />
+                  <h2 className="font-display font-semibold text-lg">Actividad Física</h2>
+                </div>
+
+                {/* Activity summary cards */}
+                <div className="grid grid-cols-3 gap-3 mb-5">
+                  <div className="text-center p-3 rounded-2xl bg-muted/50">
+                    <Timer className="w-4 h-4 mx-auto mb-1 text-primary" />
+                    <div className="font-display font-bold text-lg">{totals.duration}</div>
+                    <div className="text-[10px] text-muted-foreground">min totales</div>
+                  </div>
+                  <div className="text-center p-3 rounded-2xl bg-muted/50">
+                    <Footprints className="w-4 h-4 mx-auto mb-1 text-primary" />
+                    <div className="font-display font-bold text-lg">{totals.steps.toLocaleString()}</div>
+                    <div className="text-[10px] text-muted-foreground">pasos</div>
+                  </div>
+                  <div className="text-center p-3 rounded-2xl bg-muted/50">
+                    <Zap className="w-4 h-4 mx-auto mb-1 text-primary" />
+                    <div className="font-display font-bold text-lg">{totals.calories}</div>
+                    <div className="text-[10px] text-muted-foreground">kcal quemadas</div>
+                  </div>
+                </div>
+
+                {/* Add activity form */}
+                {isToday && (
+                  <div className="space-y-3 mb-5">
+                    <div className="flex flex-wrap gap-2">
+                      {ACTIVITY_TYPES.map(t => (
+                        <button
+                          key={t.value}
+                          onClick={() => setActType(t.value)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-medium border-2 transition-all ${actType === t.value ? 'border-primary bg-accent text-accent-foreground' : 'border-border hover:border-primary/30'}`}
+                        >
+                          {t.emoji} {t.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <label className="text-[10px] text-muted-foreground mb-1 block">Duración (min)</label>
+                        <Input type="number" value={actDuration} onChange={e => setActDuration(e.target.value)} className="rounded-xl" min={1} max={600} />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-[10px] text-muted-foreground mb-1 block">Pasos (opcional)</label>
+                        <Input type="number" value={actSteps} onChange={e => setActSteps(e.target.value)} className="rounded-xl" min={0} />
+                      </div>
+                      <div className="flex items-end">
+                        <Button size="sm" onClick={handleAddActivity} disabled={addingAct} className="rounded-xl bio-gradient border-0 text-primary-foreground gap-1">
+                          {addingAct ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Añadir
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Activity list */}
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {actLoading ? (
+                    <div className="flex justify-center py-4"><Loader2 className="w-4 h-4 animate-spin text-primary" /></div>
+                  ) : activities.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      {isToday ? 'Registra tu primera actividad del día' : 'Sin actividad registrada este día'}
+                    </p>
+                  ) : (
+                    activities.map(a => {
+                      const typeInfo = ACTIVITY_TYPES.find(t => t.value === a.activity_type) || ACTIVITY_TYPES[6];
+                      return (
+                        <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 text-sm">
+                          <div className="flex items-center gap-2">
+                            <span>{typeInfo.emoji}</span>
+                            <span className="font-medium">{typeInfo.label}</span>
+                            <span className="text-xs text-muted-foreground">{a.duration_min} min{a.steps > 0 ? ` · ${a.steps.toLocaleString()} pasos` : ''}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-primary">{a.calories_burned} kcal</span>
+                            {isToday && (
+                              <button onClick={() => deleteActivity(a.id)} className="text-muted-foreground hover:text-destructive transition-colors">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </motion.div>
           </>
         )}
       </main>
