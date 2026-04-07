@@ -133,6 +133,23 @@ const Dashboard = () => {
   };
 
 
+  const handleAddActivity = async () => {
+    const dur = parseInt(actDuration) || 0;
+    const steps = parseInt(actSteps) || 0;
+    if (dur <= 0 || dur > 600) {
+      toast({ title: 'Duración inválida', description: 'Introduce entre 1 y 600 minutos.', variant: 'destructive' });
+      return;
+    }
+    setAddingAct(true);
+    const typeInfo = ACTIVITY_TYPES.find(t => t.value === actType) || ACTIVITY_TYPES[6];
+    const cals = Math.round(typeInfo.calsPerMin * dur);
+    await addActivity({ activity_type: actType, duration_min: dur, steps, calories_burned: cals, notes: '' });
+    setActDuration('30');
+    setActSteps('0');
+    toast({ title: 'Actividad registrada', description: `${typeInfo.label} — ${dur} min · ${cals} kcal quemadas` });
+    setAddingAct(false);
+  };
+
   const summaryCards = [
     { icon: Flame, label: 'Calorías', value: `${log.calories}`, sub: `/ ${calorieData.dailyCalories} kcal`, color: 'text-primary' },
     { icon: Droplets, label: 'Agua', value: `${log.water_ml}`, sub: `/ ${waterGoal} ml`, color: 'text-blue-500' },
