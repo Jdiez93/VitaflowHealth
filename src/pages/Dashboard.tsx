@@ -99,7 +99,6 @@ const Dashboard = () => {
   const calPercent = calorieData.dailyCalories > 0 ? Math.min(Math.round((log.calories / calorieData.dailyCalories) * 100), 100) : 0;
   const waterGoal = 2500;
   const waterPercent = Math.min(Math.round((log.water_ml / waterGoal) * 100), 100);
-  const stepsGoal = 10000;
 
   const displayName = profile?.full_name || 'Usuario';
   const goalLabels: Record<string, string> = { lose_fat: 'Perder grasa', gain_muscle: 'Ganar músculo', maintain: 'Mantenerme' };
