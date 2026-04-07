@@ -1,12 +1,13 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Header from '@/components/layout/Header';
-import { Flame, Droplets, Target, Plus, CalendarDays, AlertCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Flame, Droplets, Target, Plus, CalendarDays, AlertCircle, ChevronLeft, ChevronRight, Loader2, Activity, Trash2, Footprints, Timer, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { Meal } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useDailyLog } from '@/hooks/useDailyLog';
+import { useActivityLog, ACTIVITY_TYPES } from '@/hooks/useActivityLog';
 import { calculateCalories } from '@/lib/calories';
 import { useToast } from '@/hooks/use-toast';
 
