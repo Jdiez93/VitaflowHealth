@@ -83,11 +83,15 @@ const Dashboard = () => {
   const isToday = dateOffset === 0;
 
   const { log, loading, addMeal, addWater } = useDailyLog(selectedDate);
-
+  const { activities, loading: actLoading, addActivity, deleteActivity, totals } = useActivityLog(selectedDate);
 
   const [mealInput, setMealInput] = useState('');
   const [mealQuantity, setMealQuantity] = useState('100');
   const [addingMeal, setAddingMeal] = useState(false);
+  const [actType, setActType] = useState('walking');
+  const [actDuration, setActDuration] = useState('30');
+  const [actSteps, setActSteps] = useState('0');
+  const [addingAct, setAddingAct] = useState(false);
 
   const calorieData = useMemo(() => calculateCalories({
     weight: profile?.weight ? Number(profile.weight) : null,
