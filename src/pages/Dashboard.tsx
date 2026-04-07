@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Header from '@/components/layout/Header';
-import { Flame, Droplets, Footprints, Target, Plus, CalendarDays, AlertCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Flame, Droplets, Target, Plus, CalendarDays, AlertCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { Meal } from '@/types';
@@ -99,7 +99,6 @@ const Dashboard = () => {
   const calPercent = calorieData.dailyCalories > 0 ? Math.min(Math.round((log.calories / calorieData.dailyCalories) * 100), 100) : 0;
   const waterGoal = 2500;
   const waterPercent = Math.min(Math.round((log.water_ml / waterGoal) * 100), 100);
-  const stepsGoal = 10000;
 
   const displayName = profile?.full_name || 'Usuario';
   const goalLabels: Record<string, string> = { lose_fat: 'Perder grasa', gain_muscle: 'Ganar músculo', maintain: 'Mantenerme' };
@@ -132,7 +131,6 @@ const Dashboard = () => {
   const summaryCards = [
     { icon: Flame, label: 'Calorías', value: `${log.calories}`, sub: `/ ${calorieData.dailyCalories} kcal`, color: 'text-primary' },
     { icon: Droplets, label: 'Agua', value: `${log.water_ml}`, sub: `/ ${waterGoal} ml`, color: 'text-blue-500' },
-    { icon: Footprints, label: 'Pasos', value: `${log.steps.toLocaleString()}`, sub: `/ ${stepsGoal.toLocaleString()}`, color: 'text-orange-500' },
     { icon: Target, label: 'Objetivo', value: goalLabels[profile?.goal || ''] || '—', sub: calorieData.complete ? `TMB: ${calorieData.tmb}` : 'Completa tu perfil', color: 'text-primary' },
   ];
 
