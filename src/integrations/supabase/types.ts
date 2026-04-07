@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          activity_type: string
+          calories_burned: number
+          created_at: string
+          date: string
+          duration_min: number
+          id: string
+          notes: string
+          steps: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_type?: string
+          calories_burned?: number
+          created_at?: string
+          date?: string
+          duration_min?: number
+          id?: string
+          notes?: string
+          steps?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          calories_burned?: number
+          created_at?: string
+          date?: string
+          duration_min?: number
+          id?: string
+          notes?: string
+          steps?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_logs: {
         Row: {
           calories: number
